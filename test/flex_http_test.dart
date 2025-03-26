@@ -6,9 +6,10 @@ void main() {
   late FlexHttp client;
 
   setUp(() {
-    final builder = FlexHttpBuilder(baseUrl: 'https://jsonplaceholder.typicode.com')
-        .withLogging(true)
-        .withMaxRetries(1);
+    final builder =
+        FlexHttpBuilder(baseUrl: 'https://jsonplaceholder.typicode.com')
+            .withLogging(true)
+            .withMaxRetries(1);
     client = builder.build();
   });
 
@@ -23,7 +24,8 @@ void main() {
       expect(response.decodedBody(), isMap);
       expect(response.decodedBody()['id'], 1);
       expect(response.decodedBody()['title'], isNotEmpty);
-      expect(response.headers.value('content-type'), contains('application/json'));
+      expect(
+          response.headers.value('content-type'), contains('application/json'));
     });
 
     test('POST request creates a resource with 201 status', () async {
@@ -41,7 +43,12 @@ void main() {
     test('PUT request updates a resource', () async {
       final response = await client.put<Map<String, dynamic>>(
         '/posts/1',
-        body: {'id': 1, 'title': 'Updated Post', 'body': 'Updated', 'userId': 1},
+        body: {
+          'id': 1,
+          'title': 'Updated Post',
+          'body': 'Updated',
+          'userId': 1
+        },
       );
       expect(response.statusCode, 200);
       expect(response.decodedBody()['title'], 'Updated Post');
@@ -96,7 +103,7 @@ void main() {
           .withLogging(true);
       final failingClient = builder.build();
       expect(
-            () async => await failingClient.get('/test'),
+        () async => await failingClient.get('/test'),
         throwsA(isA<FlexHttpException>()
             .having((e) => e.message, 'message', contains('Network error'))),
       );
@@ -104,12 +111,13 @@ void main() {
     });
 
     test('Request cancellation works with interceptor', () async {
-      final builder = FlexHttpBuilder(baseUrl: 'https://jsonplaceholder.typicode.com')
-          .withInterceptor(_CancelInterceptor())
-          .withLogging(true);
+      final builder =
+          FlexHttpBuilder(baseUrl: 'https://jsonplaceholder.typicode.com')
+              .withInterceptor(_CancelInterceptor())
+              .withLogging(true);
       final requestClient = builder.build();
       expect(
-            () async => await requestClient.get('/posts/1'),
+        () async => await requestClient.get('/posts/1'),
         throwsA(isA<FlexHttpException>()
             .having((e) => e.message, 'message', 'Request cancelled')),
       );
@@ -117,19 +125,20 @@ void main() {
     });
 
     test('GET with invalid endpoint returns 404', () async {
-      final response = await client.get<Map<String, dynamic>>('/invalid-endpoint');
+      final response =
+          await client.get<Map<String, dynamic>>('/invalid-endpoint');
       expect(response.statusCode, 404);
       expect(response.body, '{}');
     });
 
     test('POST with malformed JSON throws exception', () async {
       expect(
-            () async => await client.post<Map<String, dynamic>>(
+        () async => await client.post<Map<String, dynamic>>(
           '/posts',
           body: () => 'not json', // Unencodable object (a function)
         ),
         throwsA(isA<FlexHttpException>().having(
-              (e) => e.message,
+          (e) => e.message,
           'message',
           contains('Converting object to an encodable object failed'),
         )),
@@ -137,12 +146,13 @@ void main() {
     });
 
     test('Timeout triggers with short duration', () async {
-      final builder = FlexHttpBuilder(baseUrl: 'https://jsonplaceholder.typicode.com')
-          .withTimeout(Duration(milliseconds: 1))
-          .withMaxRetries(0);
+      final builder =
+          FlexHttpBuilder(baseUrl: 'https://jsonplaceholder.typicode.com')
+              .withTimeout(Duration(milliseconds: 1))
+              .withMaxRetries(0);
       final slowClient = builder.build();
       expect(
-            () async => await slowClient.get('/posts/1'),
+        () async => await slowClient.get('/posts/1'),
         throwsA(isA<FlexHttpException>()
             .having((e) => e.message, 'message', 'Request timed out')),
       );
@@ -150,9 +160,11 @@ void main() {
     });
 
     test('Caching works with GET requests', () async {
-      final response1 = await client.get<Map<String, dynamic>>('/posts/1', useCache: true);
+      final response1 =
+          await client.get<Map<String, dynamic>>('/posts/1', useCache: true);
       expect(response1.statusCode, 200);
-      final response2 = await client.get<Map<String, dynamic>>('/posts/1', useCache: true);
+      final response2 =
+          await client.get<Map<String, dynamic>>('/posts/1', useCache: true);
       expect(response2.statusCode, 200);
       expect(response2.body, response1.body);
       expect(response2.decodedBody()['id'], 1);
@@ -160,13 +172,19 @@ void main() {
 
     test('Multiple interceptors execute in order', () async {
       final log = <String>[];
-      final builder = FlexHttpBuilder(baseUrl: 'https://jsonplaceholder.typicode.com')
-          .withInterceptor(_LoggingInterceptor('First', log))
-          .withInterceptor(_LoggingInterceptor('Second', log));
+      final builder =
+          FlexHttpBuilder(baseUrl: 'https://jsonplaceholder.typicode.com')
+              .withInterceptor(_LoggingInterceptor('First', log))
+              .withInterceptor(_LoggingInterceptor('Second', log));
       final multiClient = builder.build();
       final response = await multiClient.get('/posts/1');
       expect(response.statusCode, 200);
-      expect(log, ['First Request', 'Second Request', 'First Response', 'Second Response']);
+      expect(log, [
+        'First Request',
+        'Second Request',
+        'First Response',
+        'Second Response'
+      ]);
       multiClient.close();
     });
   });

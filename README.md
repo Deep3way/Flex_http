@@ -5,7 +5,7 @@ A lightweight, flexible, and user-friendly HTTP client for Dart and Flutter, dev
 
 ## Features
 
-- **Cross-Platform**: Works on iOS, Android, Web, Windows, macOS, Linux.
+- **Cross-Platform**: Works on iOS, Android, Windows, macOS, Linux.
 - **HTTP Methods**: Supports GET, POST, PUT, DELETE, PATCH, and file uploads.
 - **Automatic Retries**: Configurable retry logic for handling network failures.
 - **In-Memory Caching**: Cache GET responses to reduce redundant requests.
