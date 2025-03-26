@@ -463,12 +463,18 @@ class FlexHttpException implements Exception {
   FlexHttpException(this.message, {this.statusCode});
 
   factory FlexHttpException.fromError(dynamic error) {
-    if (error is SocketException)
+    if (error is SocketException) {
       return FlexHttpException('Network error: ${error.message}');
-    if (error is TimeoutException)
+    }
+    if (error is TimeoutException) {
       return FlexHttpException('Request timed out');
-    if (error is FlexHttpException) return error;
-    return FlexHttpException('Unknown error: $error');
+    }
+    if (error is FlexHttpException) {
+      return error;
+    }
+
+    // Preserve the original structure for testing while ensuring safety
+    return FlexHttpException('Unknown error: ${error.toString()}');
   }
 
   @override

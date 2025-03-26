@@ -22,7 +22,7 @@ Add the `flex_http` package to your project by including it in your `pubspec.yam
 
 ```yaml
 dependencies:
-  flex_http: ^0.1.1
+  flex_http: ^0.1.2
 ```
 
 Then, run:
